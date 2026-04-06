@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>证件照制作工具 - 智能抠图 · 本地处理</title>
+  <meta name="description" content="本地运行的个人证件照制作工具，AI 智能抠图，自定义尺寸，高质量 PNG 导出">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="coi-serviceworker.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header id="app-header">
+      <div class="header-inner">
+        <div class="logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <defs>
+              <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#818cf8"/>
+                <stop offset="100%" style="stop-color:#c084fc"/>
+              </linearGradient>
+            </defs>
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <h1>证件照制作工具</h1>
+        </div>
+        <span class="header-badge">AI 本地处理 · 隐私安全</span>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main id="main-content">
+      <!-- Left Panel -->
+      <aside id="controls-panel">
+        <!-- Upload -->
+        <section class="control-section">
+          <div class="section-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <h2>上传照片</h2>
+          </div>
+          <div id="upload-zone">
+            <input type="file" id="file-input" accept="image/*" hidden>
+            <div id="upload-content">
+              <div class="upload-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+              <p class="upload-text">点击或拖拽上传照片</p>
+              <p class="upload-hint">支持 JPG / PNG / WebP</p>
+            </div>
+            <img id="preview-thumb" alt="预览">
+          </div>
+        </section>
+
+        <!-- Size -->
+        <section class="control-section">
+          <div class="section-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            <h2>目标尺寸</h2>
+          </div>
+          <div class="presets">
+            <button class="preset-btn active" data-w="295" data-h="413">1 寸</button>
+            <button class="preset-btn" data-w="413" data-h="579">2 寸</button>
+            <button class="preset-btn" data-w="260" data-h="378">小 1 寸</button>
+            <button class="preset-btn" data-w="413" data-h="531">小 2 寸</button>
+            <button class="preset-btn" data-w="390" data-h="567">护照</button>
+          </div>
+          <div class="size-inputs">
+            <div class="input-group">
+              <label for="target-width">宽度</label>
+              <div class="input-wrap">
+                <input type="number" id="target-width" value="295" min="50" max="5000">
+                <span class="input-unit">px</span>
+              </div>
+            </div>
+            <svg class="size-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            <div class="input-group">
+              <label for="target-height">高度</label>
+              <div class="input-wrap">
+                <input type="number" id="target-height" value="413" min="50" max="5000">
+                <span class="input-unit">px</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Background Color -->
+        <section class="control-section">
+          <div class="section-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="15.5" r="2.5"/><circle cx="8.5" cy="15.5" r="2.5"/></svg>
+            <h2>背景颜色</h2>
+          </div>
+          <div class="color-presets">
+            <button class="color-btn active" data-color="#ffffff" title="白色">
+              <span style="background:#ffffff"></span>
+            </button>
+            <button class="color-btn" data-color="#438edb" title="蓝色">
+              <span style="background:#438edb"></span>
+            </button>
+            <button class="color-btn" data-color="#d32f2f" title="红色">
+              <span style="background:#d32f2f"></span>
+            </button>
+            <button class="color-btn" data-color="#e8e8e8" title="浅灰">
+              <span style="background:#e8e8e8"></span>
+            </button>
+            <button class="color-btn" data-color="#1976d2" title="深蓝">
+              <span style="background:#1976d2"></span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Process Button -->
+        <button id="process-btn" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <span>开始智能抠图</span>
+        </button>
+
+        <!-- Editor Controls (hidden until processed) -->
+        <div id="editor-controls">
+          <section class="control-section">
+            <div class="section-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              <h2>缩放调整</h2>
+            </div>
+            <div class="zoom-control">
+              <button id="zoom-out" class="zoom-btn" title="缩小">−</button>
+              <input type="range" id="zoom-slider" min="10" max="500" value="100">
+              <button id="zoom-in" class="zoom-btn" title="放大">+</button>
+              <span id="zoom-value">100%</span>
+            </div>
+            <button id="reset-pos-btn" class="secondary-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              重置位置
+            </button>
+          </section>
+
+          <button id="export-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>导出证件照 (PNG)</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Right Panel: Canvas Editor -->
+      <div id="editor-panel">
+        <div id="canvas-container">
+          <canvas id="editor-canvas"></canvas>
+          <div id="empty-state">
+            <div class="empty-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <h3>等待上传照片</h3>
+            <p>上传照片并点击「开始智能抠图」开始制作</p>
+          </div>
+        </div>
+        <div id="canvas-hints">
+          <span>🖱️ 拖拽移动</span>
+          <span>🔍 滚轮缩放</span>
+          <span>📐 虚线框 = 导出区域</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">
+    <div class="loading-card">
+      <div class="loading-spinner">
+        <svg viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="20" fill="none" stroke="url(#spinner-grad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="80 200" stroke-dashoffset="0"/>
+          <defs>
+            <linearGradient id="spinner-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#818cf8"/>
+              <stop offset="100%" style="stop-color:#c084fc"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <p id="loading-text">正在初始化...</p>
+      <div class="progress-bar">
+        <div id="loading-progress"></div>
+      </div>
+      <p class="loading-hint">首次使用需下载 AI 模型（约 30MB），请耐心等待</p>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
